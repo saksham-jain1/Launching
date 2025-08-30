@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kartik Stocks Academy | Advanced Trading Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        font-family: "Inter", sans-serif;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        background-color: #000;
+        color: #fff;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+        }
+
+        50% {
+          transform: translateY(-1.25em);
+        }
+
+        100% {
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 0.6;
+        }
+
+        50% {
+          opacity: 1;
+        }
+
+        100% {
+          opacity: 0.6;
+        }
+      }
+
+      .floating {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      .pulsing {
+        animation: pulse 3s ease-in-out infinite;
+      }
+
+      .gradient-bg {
+        background: linear-gradient(135deg, #1e3a8a 0%, #0ea5e9 100%);
+      }
+
+      .trading-bg {
+        background-image: url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1600&q=80");
+        background-size: cover;
+        background-position: center;
+        background-blend-mode: overlay;
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+
+      .chart-line {
+        position: absolute;
+        width: 100%;
+        height: 0.15em;
+        background: linear-gradient(90deg, transparent, #10b981, transparent);
+        opacity: 0.3;
+      }
+
+      .chart-line:nth-child(1) {
+        top: 20%;
+        animation: moveLine 8s linear infinite;
+      }
+
+      .chart-line:nth-child(2) {
+        top: 40%;
+        animation: moveLine 12s linear infinite reverse;
+      }
+
+      .chart-line:nth-child(3) {
+        top: 60%;
+        animation: moveLine 10s linear infinite;
+      }
+
+      .chart-line:nth-child(4) {
+        top: 80%;
+        animation: moveLine 15s linear infinite reverse;
+      }
+
+      @keyframes moveLine {
+        0% {
+          transform: translateX(-100%);
+        }
+
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      .trader-animation {
+        position: relative;
+      }
+
+      .trader-animation::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at center,
+          rgba(16, 185, 129, 0.1) 0%,
+          transparent 70%
+        );
+        animation: pulse 4s ease-in-out infinite;
+        border-radius: inherit;
+        z-index: -1;
+      }
+
+      section {
+        margin: 0;
+        padding-top: 4em;
+        padding-bottom: 4em;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      /* Marquee container */
+      #market-sectors-marquee {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: #111827; /* Tailwind gray-900 */
+        color: #d1d5db; /* Tailwind gray-300 */
+        font-weight: 600;
+        font-family: "Inter", sans-serif;
+        overflow: hidden;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        z-index: 60;
+        border-bottom: 1px solid #374151; /* Tailwind gray-700 */
+      }
+
+      #market-sectors-marquee .marquee-content {
+        display: inline-flex;
+        white-space: nowrap;
+        animation: marquee 20s linear infinite;
+        gap: 3rem;
+        padding-left: 100%;
+      }
+
+      @keyframes marquee {
+        0% {
+          transform: translateX(0%);
+        }
+
+        100% {
+          transform: translateX(-100%);
+        }
+      }
+
+      /* Positive and negative value styles */
+      .positive {
+        color: #10b981; /* emerald-500 */
+        font-weight: 700;
+      }
+
+      .negative {
+        color: #ef4444; /* red-500 */
+        font-weight: 700;
+      }
+
+      /* Adjust navbar top padding to avoid overlap with marquee */
+      nav.gradient-bg {
+        padding-top: 2.5rem; /* height of marquee */
+      }
+    </style>
+  </head>
+
+  <body class="font-sans text-white min-h-screen">
+    <div
+      id="market-sectors-marquee"
+      aria-label="Indian Stock Market Sectors Ticker"
+    >
+      <div
+        class="marquee-content"
+        aria-live="polite"
+        aria-atomic="true"
+        aria-relevant="additions"
+      >
+        <!-- Dynamic sector items will be rendered by JS. Placeholders for initial load: -->
+        <div>
+          <span class="font-bold">NIFTY 50</span>
+          <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">SENSEX</span> <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">NIFTY 100</span>
+          <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">NIFTY FMCG</span>
+          <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">NIFTY BANK</span>
+          <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">NIFTY IT</span>
+          <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">NIFTY PHARMA</span>
+          <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">NIFTY METAL</span>
+          <span class="neutral">--</span>
+        </div>
+        <!-- Repeat for smooth scroll -->
+        <div>
+          <span class="font-bold">NIFTY 50</span>
+          <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">SENSEX</span> <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">NIFTY 100</span>
+          <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">NIFTY FMCG</span>
+          <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">NIFTY BANK</span>
+          <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">NIFTY IT</span>
+          <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">NIFTY PHARMA</span>
+          <span class="neutral">--</span>
+        </div>
+        <div>
+          <span class="font-bold">NIFTY METAL</span>
+          <span class="neutral">--</span>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Map sector names to NSE index symbols
+      const sectorSymbols = {
+        "NIFTY 50": "NIFTY 50",
+        "NIFTY BANK": "NIFTY BANK",
+        "NIFTY IT": "NIFTY IT",
+        "NIFTY FMCG": "NIFTY FMCG",
+        "NIFTY PHARMA": "NIFTY PHARMA",
+        "NIFTY METAL": "NIFTY METAL",
+        "NIFTY 100": "NIFTY 100",
+        SENSEX: "SENSEX",
+      };
+
+      // NSE API endpoint for indices
+      const NSE_API = "https://www.nseindia.com/api/allIndices";
+
+      async function fetchNSEIndices() {
+        try {
+          // NSE blocks requests without a browser-like User-Agent and Referer
+          const response = await fetch(NSE_API, {
+            headers: {
+              "User-Agent": "Mozilla/5.0",
+              Accept: "application/json",
+              Referer: "https://www.nseindia.com/",
+            },
+          });
+          console.log(response);
+          if (!response.ok) throw new Error("NSE API error");
+          const data = await response.json();
+          return data.data || [];
+        } catch (e) {
+          console.error("Failed to fetch NSE data", e);
+          return [];
+        }
+      }
+
+      function updateMarqueeWithLiveData(nseData) {
+        const marqueeContent = document.getElementById("marquee-content");
+        marqueeContent.innerHTML = "";
+        // Build a map for quick lookup
+        const indexMap = {};
+        nseData.forEach((idx) => {
+          indexMap[idx.index] = idx;
+        });
+
+        Object.entries(sectorSymbols).forEach(([name, nseName]) => {
+          const idx = indexMap[nseName];
+          let changePercent = idx ? idx.perChange : null;
+          let valueText = "--";
+          let valueClass = "neutral";
+          if (
+            changePercent !== undefined &&
+            changePercent !== null &&
+            !isNaN(parseFloat(changePercent))
+          ) {
+            changePercent = parseFloat(changePercent);
+            valueText =
+              (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
+            valueClass = changePercent >= 0 ? "positive" : "negative";
+          }
+          const div = document.createElement("div");
+          div.className =
+            "sector-item flex items-center gap-1 mr-12 whitespace-nowrap";
+          const nameSpan = document.createElement("span");
+          nameSpan.className = "font-bold";
+          nameSpan.textContent = name;
+          const valueSpan = document.createElement("span");
+          valueSpan.className = valueClass;
+          valueSpan.textContent = valueText;
+          div.appendChild(nameSpan);
+          div.appendChild(valueSpan);
+          marqueeContent.appendChild(div);
+        });
+        // Repeat for smooth scroll
+        Object.entries(sectorSymbols).forEach(([name, nseName]) => {
+          const idx = indexMap[nseName];
+          let changePercent = idx ? idx.perChange : null;
+          let valueText = "--";
+          let valueClass = "neutral";
+          if (
+            changePercent !== undefined &&
+            changePercent !== null &&
+            !isNaN(parseFloat(changePercent))
+          ) {
+            changePercent = parseFloat(changePercent);
+            valueText =
+              (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
+            valueClass = changePercent >= 0 ? "positive" : "negative";
+          }
+          const div = document.createElement("div");
+          div.className =
+            "sector-item flex items-center gap-1 mr-12 whitespace-nowrap";
+          const nameSpan = document.createElement("span");
+          nameSpan.className = "font-bold";
+          nameSpan.textContent = name;
+          const valueSpan = document.createElement("span");
+          valueSpan.className = valueClass;
+          valueSpan.textContent = valueText;
+          div.appendChild(nameSpan);
+          div.appendChild(valueSpan);
+          marqueeContent.appendChild(div);
+        });
+      }
+
+      async function refreshStockTicker() {
+        const nseData = await fetchNSEIndices();
+        updateMarqueeWithLiveData(nseData);
+      }
+
+      // Initial load and refresh every 60 seconds
+      refreshStockTicker();
+      setInterval(refreshStockTicker, 60000);
+    </script>
+    <!-- Navigation -->
+    <nav class="gradient-bg fixed w-full z-50 shadow-lg">
+      <div
+        class="container mx-auto px-6 py-4 flex items-center justify-between"
+      >
+        <div class="flex items-center space-x-4">
+          <img
+            src="./assets/logo.jpeg"
+            alt="Kartik Stocks Academy Logo"
+            class="max-w-[80px] md:max-w-[100px]"
+          />
+          <span class="text-xl font-bold whitespace-nowrap"
+            >Kartik <span class="text-emerald-400">Stocks Academy</span></span
+          >
+        </div>
+        <div class="hidden md:flex space-x-8 text-lg">
+          <a href="#home" class="hover:text-emerald-400 transition">Home</a>
+          <a href="#features" class="hover:text-emerald-400 transition"
+            >Features</a
+          >
+          <a href="#testimonials" class="hover:text-emerald-400 transition"
+            >Testimonials</a
+          >
+          <a href="#about" class="hover:text-emerald-400 transition">About</a>
+          <a href="#contact" class="hover:text-emerald-400 transition"
+            >Contact</a
+          >
+        </div>
+        <div class="md:hidden">
+          <button
+            id="mobile-menu-button"
+            aria-label="Toggle menu"
+            class="text-white focus:outline-none"
+          >
+            <i class="fas fa-bars text-2xl"></i>
+          </button>
+        </div>
+      </div>
+      <!-- Mobile Menu -->
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-gradient-to-b from-blue-900 to-blue-600 px-6 pb-4"
+      >
+        <a
+          href="#home"
+          class="block py-2 text-white hover:text-emerald-400 transition"
+          >Home</a
+        >
+        <a
+          href="#features"
+          class="block py-2 text-white hover:text-emerald-400 transition"
+          >Features</a
+        >
+        <a
+          href="#testimonials"
+          class="block py-2 text-white hover:text-emerald-400 transition"
+          >Testimonials</a
+        >
+        <a
+          href="#about"
+          class="block py-2 text-white hover:text-emerald-400 transition"
+          >About</a
+        >
+        <a
+          href="#contact"
+          class="block py-2 text-white hover:text-emerald-400 transition"
+          >Contact</a
+        >
+      </div>
+    </nav>
+
+    <!-- Hero Section with Animated Background -->
+    <section
+      id="home"
+      class="trading-bg min-h-screen flex items-center pt-20 relative overflow-hidden"
+    >
+      <div class="absolute inset-0 bg-black opacity-50"></div>
+      <div class="chart-line"></div>
+      <div class="chart-line"></div>
+      <div class="chart-line"></div>
+      <div class="chart-line"></div>
+      <div class="container mx-auto px-6 z-10">
+        <div class="flex flex-col md:flex-row items-center">
+          <div class="md:w-1/2 mb-12 md:mb-0">
+            <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6">
+              Master The Markets With
+              <span class="text-emerald-400">Kartik Stocks Academy</span>
+            </h1>
+            <p class="text-xl mb-8 text-gray-300">
+              From beginner to advanced trader - Learn from NISM certified
+              research analyst with proven strategies for consistent profits.
+            </p>
+            <div
+              class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
+            >
+              <button
+                class="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-full font-semibold transition duration-300 transform hover:scale-105 w-full sm:w-auto"
+              >
+                Start Trading Now
+              </button>
+              <button
+                class="border border-white hover:bg-white hover:text-black text-white px-8 py-3 rounded-full font-semibold transition duration-300 w-full sm:w-auto"
+              >
+                Learn More
+              </button>
+            </div>
+          </div>
+          <div class="md:w-1/2 trader-animation w-full max-w-md mx-auto">
+            <div class="relative floating">
+              <img
+                src="https://images.unsplash.com/photo-1601924992347-b01d7a924743?auto=format&fit=crop&w=800&q=80"
+                alt="Trader using Kartik Stocks Academy"
+                class="rounded-xl shadow-2xl border-4 border-emerald-400/30 w-full"
+              />
+              <div
+                class="absolute -bottom-5 -right-5 bg-emerald-500 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
+              >
+                <i class="fas fa-chart-pie text-3xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="bg-gray-50 py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+          <div class="bg-white p-6 rounded-lg shadow">
+            <div class="text-blue-600 text-4xl font-bold mb-2">500+</div>
+            <div class="text-gray-600">Students Trained</div>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow">
+            <div class="text-blue-600 text-4xl font-bold mb-2">10+</div>
+            <div class="text-gray-600">Years Experience</div>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow">
+            <div class="text-blue-600 text-4xl font-bold mb-2">100%</div>
+            <div class="text-gray-600">Practical Learning</div>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow">
+            <div class="text-blue-600 text-4xl font-bold mb-2">NISM</div>
+            <div class="text-gray-600">Certified Analyst</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="courses" class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">
+            Our Comprehensive Courses
+          </h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Structured learning paths designed to take you from absolute
+            beginner to confident trader
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Course 1 -->
+          <div
+            class="course-card bg-white rounded-xl overflow-hidden shadow-lg transition duration-300"
+          >
+            <div class="h-48 bg-blue-600 flex items-center justify-center">
+              <i class="fas fa-graduation-cap text-white text-6xl"></i>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-3">
+                Stock Market Foundation
+              </h3>
+              <p class="text-gray-600 mb-4">
+                Learn the basics of stock markets, terminology, and how to get
+                started with investing.
+              </p>
+              <div class="flex justify-between items-center">
+                <span class="text-blue-600 font-semibold"
+                  >Duration: 4 Weeks</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Course 2 -->
+          <div
+            class="course-card bg-white rounded-xl overflow-hidden shadow-lg transition duration-300"
+          >
+            <div class="h-48 bg-green-600 flex items-center justify-center">
+              <i class="fas fa-chart-bar text-white text-6xl"></i>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-3">
+                Technical Analysis Mastery
+              </h3>
+              <p class="text-gray-600 mb-4">
+                Master chart patterns, indicators, and technical tools for
+                profitable trading.
+              </p>
+              <div class="flex justify-between items-center">
+                <span class="text-blue-600 font-semibold"
+                  >Duration: 6 Weeks</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Course 3 -->
+          <div
+            class="course-card bg-white rounded-xl overflow-hidden shadow-lg transition duration-300"
+          >
+            <div class="h-48 bg-purple-600 flex items-center justify-center">
+              <i class="fas fa-crash text-white text-6xl"></i>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-3">
+                Crash Course (2-3 Months)
+              </h3>
+              <p class="text-gray-600 mb-4">
+                Comprehensive coverage of stocks, IPO, mutual funds, SIP, ETF in
+                intensive format.
+              </p>
+              <div class="flex justify-between items-center">
+                <span class="text-blue-600 font-semibold"
+                  >Duration: 3 Months</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="services" class="py-20 bg-gray-900">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16 max-w-3xl mx-auto">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4 text-white">
+            Our Premium Services
+          </h2>
+          <p class="text-xl text-gray-400">
+            Beyond education, we provide services to help you grow your
+            portfolio
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Service 1 -->
+          <div
+            class="bg-gray-800 p-8 rounded-xl hover:bg-gray-700 transition duration-300 transform hover:-translate-y-2 shadow-lg"
+          >
+            <div class="text-emerald-400 mb-4">
+              <i class="fas fa-wallet text-4xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-white">
+              Portfolio Management
+            </h3>
+            <p class="text-gray-400 mb-4">
+              Professional management of your investment portfolio tailored to
+              your risk appetite and financial goals.
+            </p>
+          </div>
+          <!-- Service 2 -->
+          <div
+            class="bg-gray-800 p-8 rounded-xl hover:bg-gray-700 transition duration-300 transform hover:-translate-y-2 shadow-lg"
+          >
+            <div class="text-emerald-400 mb-4">
+              <i class="fas fa-chess-knight text-4xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-white">
+              Trading Strategies
+            </h3>
+            <p class="text-gray-400 mb-4">
+              Proven trading strategies for different market conditions - swing,
+              intraday, positional and long-term.
+            </p>
+          </div>
+          <!-- Service 3 -->
+          <div
+            class="bg-gray-800 p-8 rounded-xl hover:bg-gray-700 transition duration-300 transform hover:-translate-y-2 shadow-lg"
+          >
+            <div class="text-emerald-400 mb-4">
+              <i class="fas fa-user-tie text-4xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-white">1-on-1 Mentorship</h3>
+            <p class="text-gray-400 mb-4">
+              Personalized coaching sessions with our NISM certified analyst to
+              refine your trading approach.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-20 gradient-bg">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16 max-w-3xl mx-auto">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">
+            What Our Traders Say
+          </h2>
+          <p class="text-xl text-gray-300">
+            Hear from traders who have transformed their results with Kartik
+            Stocks Academy.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div
+            class="bg-white/10 p-8 rounded-xl backdrop-blur-sm border border-white/10"
+          >
+            <div class="flex items-center mb-4">
+              <img
+                src="https://randomuser.me/api/portraits/women/44.jpg"
+                alt="Sarah Johnson"
+                class="w-12 h-12 rounded-full mr-4"
+              />
+              <div>
+                <h4 class="font-bold">Sarah Johnson</h4>
+                <p class="text-emerald-300 text-sm">Day Trader</p>
+              </div>
+            </div>
+            <p class="text-gray-300 italic mb-4">
+              "Since switching to Kartik Stocks Academy, my win rate has
+              improved by 35%. The platform's intuitive interface and powerful
+              tools have completely transformed my trading."
+            </p>
+            <div class="text-yellow-400">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+            </div>
+          </div>
+          <div
+            class="bg-white/10 p-8 rounded-xl backdrop-blur-sm border border-white/10"
+          >
+            <div class="flex items-center mb-4">
+              <img
+                src="https://randomuser.me/api/portraits/men/32.jpg"
+                alt="Michael Chen"
+                class="w-12 h-12 rounded-full mr-4"
+              />
+              <div>
+                <h4 class="font-bold">Michael Chen</h4>
+                <p class="text-emerald-300 text-sm">Swing Trader</p>
+              </div>
+            </div>
+            <p class="text-gray-300 italic mb-4">
+              "The founder's trading philosophy is embedded in every feature of
+              this platform. It's like having a mentor guiding your every move.
+              My account has grown 5x in 8 months."
+            </p>
+            <div class="text-yellow-400">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+            </div>
+          </div>
+          <div
+            class="bg-white/10 p-8 rounded-xl backdrop-blur-sm border border-white/10"
+          >
+            <div class="flex items-center mb-4">
+              <img
+                src="https://randomuser.me/api/portraits/men/75.jpg"
+                alt="David Rodriguez"
+                class="w-12 h-12 rounded-full mr-4"
+              />
+              <div>
+                <h4 class="font-bold">David Rodriguez</h4>
+                <p class="text-emerald-300 text-sm">Institutional Trader</p>
+              </div>
+            </div>
+            <p class="text-gray-300 italic mb-4">
+              "I've used every major platform in my 15-year career. Kartik
+              Stocks Academy stands out for its reliability and innovative
+              features. The founder truly understands traders' needs."
+            </p>
+            <div class="text-yellow-400">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star-half-alt"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-gray-900">
+      <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row items-center">
+          <div class="md:w-1/2 mb-12 md:mb-0">
+            <img
+              src="https://images.unsplash.com/photo-1582211594533-268f4f4ed5a3?auto=format&fit=crop&w=800&q=80"
+              alt="Founder of Kartik Stocks Academy"
+              class="rounded-xl shadow-2xl border-4 border-emerald-400/30 floating w-full max-w-md mx-auto"
+            />
+          </div>
+          <div class="md:w-1/2 md:pl-12">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">
+              About Kartik Stocks Academy
+            </h2>
+            <p class="text-gray-400 mb-6 text-lg">
+              Founded by a NISM certified research analyst, Kartik Stocks
+              Academy is dedicated to providing high-quality financial education
+              that empowers individuals to take control of their financial
+              future.
+            </p>
+            <p class="text-gray-400 mb-6 text-lg">
+              Our approach combines theoretical knowledge with practical
+              application, ensuring our students not only understand concepts
+              but can implement them successfully in real market conditions.
+            </p>
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <div class="flex-shrink-0 mt-1">
+                  <i class="fas fa-check-circle text-green-500"></i>
+                </div>
+                <p class="ml-3 text-lg text-gray-400">
+                  Proven track record of successful students and portfolio
+                  management
+                </p>
+              </div>
+              <div class="flex items-start">
+                <div class="flex-shrink-0 mt-1">
+                  <i class="fas fa-check-circle text-green-500"></i>
+                </div>
+                <p class="ml-3 text-lg text-gray-400">
+                  Comprehensive coverage from basics to advanced strategies
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center pt-6">
+              <div class="bg-emerald-500 text-white p-3 rounded-full mr-4">
+                <i class="fas fa-award text-2xl"></i>
+              </div>
+              <div>
+                <h4 class="font-bold">NISM certified research analyst</h4>
+                <p class="text-gray-400">With 12+ years market experience</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 gradient-bg">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">Get In Touch</h2>
+          <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+            Have questions? Our team is here to help you succeed in your trading
+            journey.
+          </p>
+        </div>
+        <div
+          class="max-w-4xl mx-auto bg-white/10 rounded-xl backdrop-blur-sm border border-white/10 p-8 md:p-12"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-2xl font-bold mb-6">Contact Information</h3>
+              <div class="space-y-6">
+                <div class="flex items-start">
+                  <div class="text-emerald-400 mr-4 mt-1">
+                    <i class="fas fa-map-marker-alt"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold">Headquarters</h4>
+                    <p class="text-gray-300">
+                      123 Trading Street, Suite 500<br />New York, NY 10005
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <div class="text-emerald-400 mr-4 mt-1">
+                    <i class="fas fa-phone-alt"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold">Phone</h4>
+                    <p class="text-gray-300">+1 (555) 123-4567</p>
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <div class="text-emerald-400 mr-4 mt-1">
+                    <i class="fas fa-envelope"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold">Email</h4>
+                    <p class="text-gray-300">support@trademasterpro.com</p>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-8">
+                <h4 class="font-bold mb-4">Follow Us</h4>
+                <div class="flex space-x-4">
+                  <a
+                    href="#"
+                    class="bg-white/10 hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition"
+                    aria-label="Twitter"
+                  >
+                    <i class="fab fa-twitter"></i>
+                  </a>
+                  <a
+                    href="#"
+                    class="bg-white/10 hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition"
+                    aria-label="LinkedIn"
+                  >
+                    <i class="fab fa-linkedin-in"></i>
+                  </a>
+                  <a
+                    href="#"
+                    class="bg-white/10 hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition"
+                    aria-label="Instagram"
+                  >
+                    <i class="fab fa-instagram"></i>
+                  </a>
+                  <a
+                    href="#"
+                    class="bg-white/10 hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition"
+                    aria-label="YouTube"
+                  >
+                    <i class="fab fa-youtube"></i>
+                  </a>
+                </div>
+              </div>
+              <!-- WhatsApp Chat Opt-in Button -->
+              <div class="mt-8">
+                <a
+                  href="https://wa.me/15551234567?text=Hello%20Kartik%20Stocks%20Academy%2C%20I%20have%20an%20inquiry%20about%20your%20trading%20platform."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="whatsapp-btn"
+                  aria-label="Chat on WhatsApp"
+                >
+                  <i class="fab fa-whatsapp text-2xl"></i> Chat with us on
+                  WhatsApp
+                </a>
+              </div>
+            </div>
+            <div>
+              <form>
+                <div class="mb-4">
+                  <label for="name" class="block mb-2 font-medium"
+                    >Your Name</label
+                  >
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  />
+                </div>
+                <div class="mb-4">
+                  <label for="email" class="block mb-2 font-medium"
+                    >Email Address</label
+                  >
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  />
+                </div>
+                <div class="mb-4">
+                  <label for="subject" class="block mb-2 font-medium"
+                    >Subject</label
+                  >
+                  <input
+                    type="text"
+                    id="subject"
+                    name="subject"
+                    class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  />
+                </div>
+                <div class="mb-4">
+                  <label for="message" class="block mb-2 font-medium"
+                    >Message</label
+                  >
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows="4"
+                    class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium w-full transition duration-300 transform hover:scale-105"
+                >
+                  Send Message
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          class="flex flex-col md:flex-row md:justify-between md:items-start gap-8"
+        >
+          <!-- About -->
+          <div class="flex-1 mb-8 md:mb-0">
+            <h3 class="text-xl font-bold mb-4 flex items-center">
+              <i class="fas fa-chart-line text-blue-400 mr-2"></i>
+              Kartik Stocks Academy
+            </h3>
+            <p class="text-gray-400 flex-1">
+              Empowering individuals with financial knowledge to achieve market
+              success through structured education and practical strategies.
+            </p>
+          </div>
+          <!-- Courses -->
+          <div class="flex-1 mb-8 md:mb-0">
+            <h4 class="text-lg font-semibold mb-4">Courses</h4>
+            <ul class="space-y-2 flex-1">
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white"
+                  >Stock Market Foundation</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white"
+                  >Technical Analysis</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white"
+                  >Crash Course</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white"
+                  >Advanced Strategies</a
+                >
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white"
+                  >Portfolio Management</a
+                >
+              </li>
+            </ul>
+          </div>
+          <!-- Social -->
+          <div class="flex-1 flex flex-col items-start">
+            <h4 class="text-lg font-semibold mb-4">Connect</h4>
+            <div class="flex space-x-4 mt-2">
+              <a href="#" class="text-gray-400 hover:text-white"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a href="#" class="text-gray-400 hover:text-white"
+                ><i class="fab fa-twitter"></i
+              ></a>
+              <a href="#" class="text-gray-400 hover:text-white"
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+              <a href="#" class="text-gray-400 hover:text-white"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a href="#" class="text-gray-400 hover:text-white"
+                ><i class="fab fa-at"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center"
+        >
+          <p class="text-gray-400 mb-4 md:mb-0">
+            © 2025 Kartik Stocks Academy. All rights reserved.
+          </p>
+          <div class="flex space-x-6">
+            <a href="#" class="text-gray-400 hover:text-white"
+              >Privacy Policy</a
+            >
+            <a href="#" class="text-gray-400 hover:text-white"
+              >Terms of Service</a
+            >
+            <a href="#" class="text-gray-400 hover:text-white">Refund Policy</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
