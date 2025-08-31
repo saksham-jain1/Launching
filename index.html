@@ -201,187 +201,113 @@
       aria-label="Indian Stock Market Sectors Ticker"
     >
       <div
+        id="marquee-content"
         class="marquee-content"
         aria-live="polite"
         aria-atomic="true"
         aria-relevant="additions"
       >
         <!-- Dynamic sector items will be rendered by JS. Placeholders for initial load: -->
-        <div>
-          <span class="font-bold">NIFTY 50</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">SENSEX</span> <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY 100</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY FMCG</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY BANK</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY IT</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY PHARMA</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY METAL</span>
-          <span class="neutral">--</span>
-        </div>
-        <!-- Repeat for smooth scroll -->
-        <div>
-          <span class="font-bold">NIFTY 50</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">SENSEX</span> <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY 100</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY FMCG</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY BANK</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY IT</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY PHARMA</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY METAL</span>
-          <span class="neutral">--</span>
-        </div>
       </div>
     </div>
     <script>
-      // Map sector names to NSE index symbols
-      const sectorSymbols = {
-        "NIFTY 50": "NIFTY 50",
-        "NIFTY BANK": "NIFTY BANK",
-        "NIFTY IT": "NIFTY IT",
-        "NIFTY FMCG": "NIFTY FMCG",
-        "NIFTY PHARMA": "NIFTY PHARMA",
-        "NIFTY METAL": "NIFTY METAL",
-        "NIFTY 100": "NIFTY 100",
-        SENSEX: "SENSEX",
+      const API_KEY = "B8PLX23APDHW17E7"; // Replace with your Alpha Vantage API Key
+      const API_ENDPOINT = "https://www.alphavantage.co/query?";
+
+      // Top Indian companies
+      const companySymbols = {
+        "Reliance Industries": "RELIANCE.BSE",
+        "Tata Consultancy": "TCS.BSE",
+        Infosys: "INFY.BSE",
+        "HDFC Bank": "HDFCBANK.BSE",
+        ICICI: "ICICIBANK.BSE",
+        SBI: "SBIN.BSE",
+        "Bharti Airtel": "BHARTIARTL.BSE",
+        "Hindustan Unilever": "HINDUNILVR.BSE",
+        "Adani Enterprises": "ADANIENT.BSE",
+        "Bajaj Finance": "BAJFINANCE.BSE",
+        ITC: "ITC.BSE",
+        Wipro: "WIPRO.BSE",
+        "Tata Motors": "TATAMOTORS.BSE",
+        "Larsen & Toubro": "LT.BSE",
+        "Sun Pharma": "SUNPHARMA.BSE",
       };
 
-      // NSE API endpoint for indices
-      const NSE_API = "https://www.nseindia.com/api/allIndices";
+      function showMessageBox(title, message) {
+        const messageBox = document.createElement("div");
+        messageBox.className = "message-box";
+        messageBox.innerHTML = `
+          <h3>${title}</h3>
+          <p>${message}</p>
+          <button onclick="this.parentNode.remove()">Close</button>
+        `;
+        document.body.appendChild(messageBox);
+      }
 
-      async function fetchNSEIndices() {
+      async function fetchQuote(symbol) {
+        const url = `${API_ENDPOINT}function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${API_KEY}`;
         try {
-          // NSE blocks requests without a browser-like User-Agent and Referer
-          const response = await fetch(NSE_API, {
-            headers: {
-              "User-Agent": "Mozilla/5.0",
-              Accept: "application/json",
-              Referer: "https://www.nseindia.com/",
-            },
-          });
+          const response = await fetch(url);
           console.log(response);
-          if (!response.ok) throw new Error("NSE API error");
+          if (!response.ok) return null;
           const data = await response.json();
-          return data.data || [];
-        } catch (e) {
-          console.error("Failed to fetch NSE data", e);
-          return [];
+          return data["Global Quote"] || null;
+        } catch {
+          return null;
         }
       }
 
-      function updateMarqueeWithLiveData(nseData) {
+      async function refreshStockTicker() {
         const marqueeContent = document.getElementById("marquee-content");
         marqueeContent.innerHTML = "";
-        // Build a map for quick lookup
-        const indexMap = {};
-        nseData.forEach((idx) => {
-          indexMap[idx.index] = idx;
-        });
 
-        Object.entries(sectorSymbols).forEach(([name, nseName]) => {
-          const idx = indexMap[nseName];
-          let changePercent = idx ? idx.perChange : null;
-          let valueText = "--";
-          let valueClass = "neutral";
-          if (
-            changePercent !== undefined &&
-            changePercent !== null &&
-            !isNaN(parseFloat(changePercent))
-          ) {
-            changePercent = parseFloat(changePercent);
-            valueText =
-              (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
-            valueClass = changePercent >= 0 ? "positive" : "negative";
+        // API key check
+        if (!API_KEY || API_KEY === "YOUR_API_KEY") {
+          showMessageBox(
+            "API Key Required",
+            "Please set a valid Alpha Vantage API key."
+          );
+          Object.keys(companySymbols).forEach((name) => {
+            const div = document.createElement("div");
+            div.className = "stock-item";
+            div.innerHTML = `<span class="font-bold">${name}</span> <span class="neutral">--</span>`;
+            marqueeContent.appendChild(div);
+          });
+          // Duplicate for infinite scroll
+          marqueeContent.innerHTML += marqueeContent.innerHTML;
+          return;
+        }
+
+        const promises = Object.entries(companySymbols).map(
+          async ([name, symbol]) => {
+            const data = await fetchQuote(symbol);
+            let valueText = "--";
+            let valueClass = "neutral";
+
+            if (data && data["10. change percent"]) {
+              const changePercent = parseFloat(data["10. change percent"]);
+              if (!isNaN(changePercent)) {
+                valueText =
+                  (changePercent >= 0 ? "+" : "") +
+                  changePercent.toFixed(2) +
+                  "%";
+                valueClass = changePercent >= 0 ? "positive" : "negative";
+              }
+            }
+
+            return `<div class="stock-item"><span class="font-bold">${name}</span> <span class="${valueClass}">${valueText}</span></div>`;
           }
-          const div = document.createElement("div");
-          div.className =
-            "sector-item flex items-center gap-1 mr-12 whitespace-nowrap";
-          const nameSpan = document.createElement("span");
-          nameSpan.className = "font-bold";
-          nameSpan.textContent = name;
-          const valueSpan = document.createElement("span");
-          valueSpan.className = valueClass;
-          valueSpan.textContent = valueText;
-          div.appendChild(nameSpan);
-          div.appendChild(valueSpan);
-          marqueeContent.appendChild(div);
-        });
-        // Repeat for smooth scroll
-        Object.entries(sectorSymbols).forEach(([name, nseName]) => {
-          const idx = indexMap[nseName];
-          let changePercent = idx ? idx.perChange : null;
-          let valueText = "--";
-          let valueClass = "neutral";
-          if (
-            changePercent !== undefined &&
-            changePercent !== null &&
-            !isNaN(parseFloat(changePercent))
-          ) {
-            changePercent = parseFloat(changePercent);
-            valueText =
-              (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
-            valueClass = changePercent >= 0 ? "positive" : "negative";
-          }
-          const div = document.createElement("div");
-          div.className =
-            "sector-item flex items-center gap-1 mr-12 whitespace-nowrap";
-          const nameSpan = document.createElement("span");
-          nameSpan.className = "font-bold";
-          nameSpan.textContent = name;
-          const valueSpan = document.createElement("span");
-          valueSpan.className = valueClass;
-          valueSpan.textContent = valueText;
-          div.appendChild(nameSpan);
-          div.appendChild(valueSpan);
-          marqueeContent.appendChild(div);
-        });
+        );
+
+        const results = await Promise.all(promises);
+
+        // Append items
+        marqueeContent.innerHTML = results.join("");
+
+        // Duplicate for infinite loop
+        marqueeContent.innerHTML += marqueeContent.innerHTML;
       }
 
-      async function refreshStockTicker() {
-        const nseData = await fetchNSEIndices();
-        updateMarqueeWithLiveData(nseData);
-      }
-
-      // Initial load and refresh every 60 seconds
       refreshStockTicker();
       setInterval(refreshStockTicker, 60000);
     </script>
