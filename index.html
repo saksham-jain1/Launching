@@ -14,6 +14,7 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        scroll-behavior: smooth;
       }
 
       html,
@@ -189,7 +190,7 @@
       }
 
       /* Adjust navbar top padding to avoid overlap with marquee */
-      nav.gradient-bg {
+      nav {
         padding-top: 2.5rem; /* height of marquee */
       }
     </style>
@@ -327,14 +328,28 @@
 
       // Initial load and refresh every 60 seconds
       refreshStockTicker();
-      setInterval(refreshStockTicker, 60000);
+      setInterval(() => {
+        // Only refresh between 9:15am and 3:30pm IST (Indian Stock Market hours)
+        const now = new Date();
+        // Convert to IST (UTC+5:30)
+        const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+        const ist = new Date(utc + 5.5 * 3600000);
+        const hours = ist.getHours();
+        const minutes = ist.getMinutes();
+        // Market open: 9:15 (9*60+15=555), close: 15:30 (15*60+30=930)
+        const totalMinutes = hours * 60 + minutes;
+        if (totalMinutes >= 555 && totalMinutes <= 930) {
+          refreshStockTicker();
+        }
+      }, 60_000);
     </script>
     <!-- Navigation -->
-    <nav class="gradient-bg fixed w-full z-50 shadow-lg">
-      <div
-        class="container mx-auto px-6 py-4 flex items-center justify-between"
-      >
-        <div class="flex items-center space-x-4">
+    <nav class="fixed w-full z-50 shadow-lg">
+      <div class="gradient-bg px-6 py-4 flex items-center justify-between">
+        <div
+          class="flex items-center space-x-4 cursor-pointer"
+          onclick="window.location.href='#home'"
+        >
           <img
             src="./assets/logo.jpeg"
             alt="Kartik Stocks Academy Logo"
@@ -362,6 +377,7 @@
             id="mobile-menu-button"
             aria-label="Toggle menu"
             class="text-white focus:outline-none"
+            onclick="document.getElementById('mobile-menu').classList.toggle('hidden')"
           >
             <i class="fas fa-bars text-2xl"></i>
           </button>
@@ -370,7 +386,8 @@
       <!-- Mobile Menu -->
       <div
         id="mobile-menu"
-        class="hidden md:hidden bg-gradient-to-b from-blue-900 to-blue-600 px-6 pb-4"
+        class="hidden md:hidden bg-gradient-to-b from-blue-900 to-blue-600 px-6 pb-4 h-full w-44 float-end"
+        onclick="document.getElementById('mobile-menu').classList.toggle('hidden')"
       >
         <a
           href="#home"
@@ -400,7 +417,7 @@
       </div>
     </nav>
 
-    <!-- Hero Section with Animated Background -->
+    <!-- Hero Section with Anirmated Background -->
     <section
       id="home"
       class="trading-bg min-h-screen flex items-center pt-20 relative overflow-hidden"
@@ -426,11 +443,13 @@
             >
               <button
                 class="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-full font-semibold transition duration-300 transform hover:scale-105 w-full sm:w-auto"
+                onclick="window.location.href='#contact'"
               >
                 Free Consultation
               </button>
               <button
                 class="border border-white hover:bg-white hover:text-black text-white px-8 py-3 rounded-full font-semibold transition duration-300 w-full sm:w-auto"
+                onclick="window.location.href='#features'"
               >
                 Explore Courses
               </button>
