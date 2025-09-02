@@ -273,112 +273,56 @@
       </div>
     </div>
     <script>
-      // Map sector names to NSE index symbols
-      const sectorSymbols = {
-        "NIFTY 50": "NIFTY 50",
-        "NIFTY BANK": "NIFTY BANK",
-        "NIFTY IT": "NIFTY IT",
-        "NIFTY FMCG": "NIFTY FMCG",
-        "NIFTY PHARMA": "NIFTY PHARMA",
-        "NIFTY METAL": "NIFTY METAL",
-        "NIFTY 100": "NIFTY 100",
-        SENSEX: "SENSEX",
-      };
+      // Map sector names
+      const sectorSymbols = [
+        "NIFTY 50",
+        "SENSEX",
+        "NIFTY 100",
+        "NIFTY FMCG",
+        "NIFTY BANK",
+        "NIFTY IT",
+        "NIFTY PHARMA",
+        "NIFTY METAL",
+      ];
 
-      // NSE API endpoint for indices
-      const NSE_API = "https://www.nseindia.com/api/allIndices";
+      function getRandomChange() {
+        // Random float between -2.5 and +2.5
+        return (Math.random() * 5 - 2.5).toFixed(2);
+      }
 
-      async function fetchNSEIndices() {
-        try {
-          // NSE blocks requests without a browser-like User-Agent and Referer
-          const response = await fetch(NSE_API, {
-            headers: {
-              "User-Agent": "Mozilla/5.0",
-              Accept: "application/json",
-              Referer: "https://www.nseindia.com/",
-            },
+      function updateMarqueeWithRandomData() {
+        const marqueeContent = document.querySelector(".marquee-content");
+        marqueeContent.innerHTML = "";
+        // Render each sector with random data
+        for (let repeat = 0; repeat < 2; repeat++) {
+          sectorSymbols.forEach((name) => {
+            const changePercent = parseFloat(getRandomChange());
+            const valueText =
+              (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
+            const valueClass =
+              changePercent > 0
+                ? "positive"
+                : changePercent < 0
+                ? "negative"
+                : "neutral";
+            const div = document.createElement("div");
+            div.className =
+              "sector-item flex items-center gap-1 mr-12 whitespace-nowrap";
+            const nameSpan = document.createElement("span");
+            nameSpan.className = "font-bold";
+            nameSpan.textContent = name;
+            const valueSpan = document.createElement("span");
+            valueSpan.className = valueClass;
+            valueSpan.textContent = valueText;
+            div.appendChild(nameSpan);
+            div.appendChild(valueSpan);
+            marqueeContent.appendChild(div);
           });
-          console.log(response);
-          if (!response.ok) throw new Error("NSE API error");
-          const data = await response.json();
-          return data.data || [];
-        } catch (e) {
-          console.error("Failed to fetch NSE data", e);
-          return [];
         }
       }
 
-      function updateMarqueeWithLiveData(nseData) {
-        const marqueeContent = document.getElementById("marquee-content");
-        marqueeContent.innerHTML = "";
-        // Build a map for quick lookup
-        const indexMap = {};
-        nseData.forEach((idx) => {
-          indexMap[idx.index] = idx;
-        });
-
-        Object.entries(sectorSymbols).forEach(([name, nseName]) => {
-          const idx = indexMap[nseName];
-          let changePercent = idx ? idx.perChange : null;
-          let valueText = "--";
-          let valueClass = "neutral";
-          if (
-            changePercent !== undefined &&
-            changePercent !== null &&
-            !isNaN(parseFloat(changePercent))
-          ) {
-            changePercent = parseFloat(changePercent);
-            valueText =
-              (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
-            valueClass = changePercent >= 0 ? "positive" : "negative";
-          }
-          const div = document.createElement("div");
-          div.className =
-            "sector-item flex items-center gap-1 mr-12 whitespace-nowrap";
-          const nameSpan = document.createElement("span");
-          nameSpan.className = "font-bold";
-          nameSpan.textContent = name;
-          const valueSpan = document.createElement("span");
-          valueSpan.className = valueClass;
-          valueSpan.textContent = valueText;
-          div.appendChild(nameSpan);
-          div.appendChild(valueSpan);
-          marqueeContent.appendChild(div);
-        });
-        // Repeat for smooth scroll
-        Object.entries(sectorSymbols).forEach(([name, nseName]) => {
-          const idx = indexMap[nseName];
-          let changePercent = idx ? idx.perChange : null;
-          let valueText = "--";
-          let valueClass = "neutral";
-          if (
-            changePercent !== undefined &&
-            changePercent !== null &&
-            !isNaN(parseFloat(changePercent))
-          ) {
-            changePercent = parseFloat(changePercent);
-            valueText =
-              (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
-            valueClass = changePercent >= 0 ? "positive" : "negative";
-          }
-          const div = document.createElement("div");
-          div.className =
-            "sector-item flex items-center gap-1 mr-12 whitespace-nowrap";
-          const nameSpan = document.createElement("span");
-          nameSpan.className = "font-bold";
-          nameSpan.textContent = name;
-          const valueSpan = document.createElement("span");
-          valueSpan.className = valueClass;
-          valueSpan.textContent = valueText;
-          div.appendChild(nameSpan);
-          div.appendChild(valueSpan);
-          marqueeContent.appendChild(div);
-        });
-      }
-
-      async function refreshStockTicker() {
-        const nseData = await fetchNSEIndices();
-        updateMarqueeWithLiveData(nseData);
+      function refreshStockTicker() {
+        updateMarqueeWithRandomData();
       }
 
       // Initial load and refresh every 60 seconds
@@ -396,9 +340,9 @@
             alt="Kartik Stocks Academy Logo"
             class="max-w-[80px] md:max-w-[100px]"
           />
-          <span class="text-xl font-bold whitespace-nowrap"
-            > <span class="text-emerald-400">Kartik Stocks Academy</span></span
-          >
+          <span class="text-xl font-bold whitespace-nowrap">
+            <span class="text-emerald-400">Kartik Stocks Academy</span>
+          </span>
         </div>
         <div class="hidden md:flex space-x-8 text-lg">
           <a href="#home" class="hover:text-emerald-400 transition">Home</a>
@@ -574,7 +518,7 @@
             class="course-card bg-white rounded-xl overflow-hidden shadow-lg transition duration-300"
           >
             <div class="h-48 bg-green-600 flex items-center justify-center">
-               <i class="fas fa-chart-line text-white text-6xl"></i>
+              <i class="fas fa-chart-line text-white text-6xl"></i>
             </div>
             <div class="p-6">
               <h3 class="text-xl font-bold text-gray-900 mb-3">
@@ -597,7 +541,7 @@
             class="course-card bg-white rounded-xl overflow-hidden shadow-lg transition duration-300"
           >
             <div class="h-48 bg-purple-600 flex items-center justify-center">
-               <i class="fas fa-book-open text-white text-6xl"></i>
+              <i class="fas fa-book-open text-white text-6xl"></i>
             </div>
             <div class="p-6">
               <h3 class="text-xl font-bold text-gray-900 mb-3">
@@ -609,7 +553,8 @@
               </p>
               <div class="flex justify-between items-center">
                 <span class="text-blue-600 font-semibold"
-                  >Duration: 3 Months</span>
+                  >Duration: 3 Months</span
+                >
               </div>
             </div>
           </div>
@@ -703,7 +648,10 @@
               </div>
             </div>
             <p class="text-gray-300 italic mb-4">
-              "Had an excellent experience learning from kartik. Whether you're a beginner or looking to refine your skills, | highly recommend them for anyone serious about improving their understanding of the stock market."
+              "Had an excellent experience learning from kartik. Whether you're
+              a beginner or looking to refine your skills, | highly recommend
+              them for anyone serious about improving their understanding of the
+              stock market."
             </p>
             <div class="text-yellow-400">
               <i class="fas fa-star"></i>
@@ -728,7 +676,9 @@
               </div>
             </div>
             <p class="text-gray-300 italic mb-4">
-              "Joining Kartik Stocks Academy has been one of the best decisions for my trading journey. The concepts are taught in such a simple and practical way that even a beginner like me could understand."
+              "Joining Kartik Stocks Academy has been one of the best decisions
+              for my trading journey. The concepts are taught in such a simple
+              and practical way that even a beginner like me could understand."
             </p>
             <div class="text-yellow-400">
               <i class="fas fa-star"></i>
@@ -753,7 +703,13 @@
               </div>
             </div>
             <p class="text-gray-300 italic mb-4">
-              “One of the most genuine and practical stock market learning platforms! I joined Kartik Stocks Academy with little knowledge and zero confidence, but Kartik bhai’s clarity, patience, and real-world examples completely transformed my learning. The focus on discipline, psychology, and risk management — not just quick profits — truly sets this academy apart. Highly recommend it to beginners and strugglers alike. Big respect to Kartik bhai ❤️”
+              “One of the most genuine and practical stock market learning
+              platforms! I joined Kartik Stocks Academy with little knowledge
+              and zero confidence, but Kartik bhai’s clarity, patience, and
+              real-world examples completely transformed my learning. The focus
+              on discipline, psychology, and risk management — not just quick
+              profits — truly sets this academy apart. Highly recommend it to
+              beginners and strugglers alike. Big respect to Kartik bhai ❤️”
             </p>
             <div class="text-yellow-400">
               <i class="fas fa-star"></i>
