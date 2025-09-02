@@ -142,210 +142,13 @@
         max-width: 100%;
         height: auto;
       }
-      /* Marquee container */
-      #market-sectors-marquee {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: #111827; /* Tailwind gray-900 */
-        color: #d1d5db; /* Tailwind gray-300 */
-        font-weight: 600;
-        font-family: "Inter", sans-serif;
-        overflow: hidden;
-        height: 2.5rem;
-        display: flex;
-        align-items: center;
-        z-index: 60;
-        border-bottom: 1px solid #374151; /* Tailwind gray-700 */
-        white-space: nowrap;
-      }
-
-      #market-sectors-marquee .marquee-content {
-        display: inline-flex;
-        animation: marquee 20s linear infinite;
-        gap: 3rem;
-      }
-
-      @keyframes marquee {
-        0% {
-          transform: translateX(0%);
-        }
-
-        100% {
-          transform: translateX(-50%);
-        }
-      }
-
-      /* Positive and negative value styles */
-      .positive {
-        color: #10b981; /* emerald-500 */
-        font-weight: 700;
-      }
-
-      .negative {
-        color: #ef4444; /* red-500 */
-        font-weight: 700;
-      }
-
-      /* Adjust navbar top padding to avoid overlap with marquee */
-      nav {
-        padding-top: 2.5rem; /* height of marquee */
-      }
     </style>
   </head>
 
   <body class="font-sans text-white min-h-screen">
-    <div
-      id="market-sectors-marquee"
-      aria-label="Indian Stock Market Sectors Ticker"
-    >
-      <div
-        class="marquee-content"
-        aria-live="polite"
-        aria-atomic="true"
-        aria-relevant="additions"
-      >
-        <!-- Dynamic sector items will be rendered by JS. Placeholders for initial load: -->
-        <div>
-          <span class="font-bold">NIFTY 50</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">SENSEX</span> <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY 100</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY FMCG</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY BANK</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY IT</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY PHARMA</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY METAL</span>
-          <span class="neutral">--</span>
-        </div>
-        <!-- Repeat for smooth scroll -->
-        <div>
-          <span class="font-bold">NIFTY 50</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">SENSEX</span> <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY 100</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY FMCG</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY BANK</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY IT</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY PHARMA</span>
-          <span class="neutral">--</span>
-        </div>
-        <div>
-          <span class="font-bold">NIFTY METAL</span>
-          <span class="neutral">--</span>
-        </div>
-      </div>
-    </div>
-    <script>
-      // Map sector names
-      const sectorSymbols = [
-        "NIFTY 50",
-        "SENSEX",
-        "NIFTY 100",
-        "NIFTY FMCG",
-        "NIFTY BANK",
-        "NIFTY IT",
-        "NIFTY PHARMA",
-        "NIFTY METAL",
-      ];
-
-      function getRandomChange() {
-        // Random float between -2.5 and +2.5
-        return (Math.random() * 5 - 2.5).toFixed(2);
-      }
-
-      function updateMarqueeWithRandomData() {
-        const marqueeContent = document.querySelector(".marquee-content");
-        marqueeContent.innerHTML = "";
-        // Render each sector with random data
-        for (let repeat = 0; repeat < 2; repeat++) {
-          sectorSymbols.forEach((name) => {
-            const changePercent = parseFloat(getRandomChange());
-            const valueText =
-              (changePercent >= 0 ? "+" : "") + changePercent.toFixed(2) + "%";
-            const valueClass =
-              changePercent > 0
-                ? "positive"
-                : changePercent < 0
-                ? "negative"
-                : "neutral";
-            const div = document.createElement("div");
-            div.className =
-              "sector-item flex items-center gap-1 mr-12 whitespace-nowrap";
-            const nameSpan = document.createElement("span");
-            nameSpan.className = "font-bold";
-            nameSpan.textContent = name;
-            const valueSpan = document.createElement("span");
-            valueSpan.className = valueClass;
-            valueSpan.textContent = valueText;
-            div.appendChild(nameSpan);
-            div.appendChild(valueSpan);
-            marqueeContent.appendChild(div);
-          });
-        }
-      }
-
-      function refreshStockTicker() {
-        updateMarqueeWithRandomData();
-      }
-
-      // Initial load and refresh every 60 seconds
-      refreshStockTicker();
-      setInterval(() => {
-        // Only refresh between 9:15am and 3:30pm IST (Indian Stock Market hours)
-        const now = new Date();
-        // Convert to IST (UTC+5:30)
-        const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-        const ist = new Date(utc + 5.5 * 3600000);
-        const hours = ist.getHours();
-        const minutes = ist.getMinutes();
-        // Market open: 9:15 (9*60+15=555), close: 15:30 (15*60+30=930)
-        const totalMinutes = hours * 60 + minutes;
-        if (totalMinutes >= 555 && totalMinutes <= 930) {
-          refreshStockTicker();
-        }
-      }, 60_000);
-    </script>
-    <!-- Navigation -->
     <nav class="fixed w-full z-50">
       <div
-        class="gradient-bg px-6 shadow-lg py-4 flex items-center justify-between"
+        class="gradient-bg px-6 h-32 shadow-lg flex items-center justify-between"
       >
         <div
           class="flex items-center space-x-4 cursor-pointer"
@@ -356,7 +159,7 @@
             alt="Kartik Stocks Academy Logo"
             class="max-w-[80px] md:max-w-[100px]"
           />
-          <span class="text-xl font-bold whitespace-nowrap">
+          <span class="text-xl font-bold">
             <span class="text-emerald-400">Kartik Stocks Academy</span>
           </span>
         </div>
@@ -421,14 +224,14 @@
     <!-- Hero Section with Anirmated Background -->
     <section
       id="home"
-      class="trading-bg min-h-screen flex items-center pt-20 relative overflow-hidden"
+      class="trading-bg min-h-screen flex items-center relative overflow-hidden"
     >
       <div class="absolute inset-0 bg-black opacity-50"></div>
       <div class="chart-line"></div>
       <div class="chart-line"></div>
       <div class="chart-line"></div>
       <div class="chart-line"></div>
-      <div class="container mx-auto px-6 z-10">
+      <div class="container mx-auto mt-24 px-6 z-10">
         <div class="flex flex-col md:flex-row items-center">
           <div class="md:w-1/2 mb-12 md:mb-0">
             <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6">
@@ -1014,18 +817,9 @@
         <div
           class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center"
         >
-          <p class="text-gray-400 mb-4 md:mb-0">
+          <p class="text-gray-400 w-full text-center">
             © 2025 Kartik Stocks Academy. All rights reserved.
           </p>
-          <div class="flex space-x-6">
-            <a href="#" class="text-gray-400 hover:text-white"
-              >Privacy Policy</a
-            >
-            <a href="#" class="text-gray-400 hover:text-white"
-              >Terms of Service</a
-            >
-            <a href="#" class="text-gray-400 hover:text-white">Refund Policy</a>
-          </div>
         </div>
       </div>
     </footer>
