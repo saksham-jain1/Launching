@@ -158,14 +158,13 @@
         align-items: center;
         z-index: 60;
         border-bottom: 1px solid #374151; /* Tailwind gray-700 */
+        white-space: nowrap;
       }
 
       #market-sectors-marquee .marquee-content {
         display: inline-flex;
-        white-space: nowrap;
         animation: marquee 20s linear infinite;
         gap: 3rem;
-        padding-left: 100%;
       }
 
       @keyframes marquee {
@@ -174,7 +173,7 @@
         }
 
         100% {
-          transform: translateX(-100%);
+          transform: translateX(-50%);
         }
       }
 
